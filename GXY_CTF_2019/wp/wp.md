@@ -113,10 +113,10 @@ if __name__ == '__main__':
  - 图片末尾有个压缩包，提取出来后发现有密码
 ![ga0](./ga0.png)
  - 爆破之，密码为8864
-![ga1](./ga1.png)
  - 得到flag.txt，打开后是这么一坨
 ![ga2](./ga2.png)
  - 进行字频统计
+
 ```python
 #!/usr/bin/python
 #__author__:TaQini
@@ -139,7 +139,9 @@ for i in f2:
 print out
 
 ```
+
  - 得到flag
+
 ![ga3](./ga3.png)
 
 ## Web
@@ -216,7 +218,7 @@ a=ls;b=head$IFS-1;c=tac$IFS;d=`$a|$b`;$c$d
 ![ping2](./ping2.png)
 
 ### HardCore PHP
- - 访问http://imagin.vip:10052/得源码
+ - 访问`http://imagin.vip:10052/`得源码
 ```php
  <?php
 if (isset($_GET['a'])) {
@@ -265,7 +267,7 @@ if(isset($_GET['exp'])){
 ?>
 ```
  - 和上一题差不多，就是增加了字符过滤
- - `getcwd`,`current`用不了，查了一下，存在一个别名pos()，可以用pos(localeconv())来生成`.`，然后读目录下文件
+ - `getcwd`,`current`用不了，查了一下，存在一个别名`pos()`，可以用`pos(localeconv())`来生成`.`，然后读目录下文件
 ![tw1](./tw1.png)
  - 过滤了flag，可以通过reverse一下数组，再next一下指针绕过
 ![tw2](./tw2.png)
@@ -278,12 +280,20 @@ http://172.21.4.12:10031/?exp=print_r(highlight_file(next(array_reverse(scandir(
 ## RE
 ### lucky guy
  - 简单的一道逆向
+
 ![guy1](./guy1.png)
- - flag由两部分组成
+
+- flag由两部分组成
+
+
+- 第一部分给出了
+
 ![guy2](./guy2.png)
- - 第一部分给出了
+
+- 第二部分简单的算一下就能解出来(偶数位-1，奇数位-2)
+
 ![guy3](./guy3.png)
- - 第二部分简单的算一下就能解出来(偶数位-1，奇数位-2)
+
 ![guy4](./guy4.png)
 
 ### Simple CPP
@@ -292,22 +302,23 @@ http://172.21.4.12:10031/?exp=print_r(highlight_file(next(array_reverse(scandir(
 ![cp2](./cp2.png)
  - 输入的字符串与`i_will_check_is_debug_or_not`按位异或
 ![cp5](./cp5.png)
- - 异或后的字符串被截成4段:i0,i1,i2,i3
+ - 异或后的字符串被截成4段:`i0`,`i1`,`i2`,`i3`
+ - `i0`,`i1`,`i2`长度为8字节，`i3`为4字节其中最后一位是`\0`
 ![cp4](./cp4.png)
  - 随后进行一系列的逻辑运算
  - 能得到几个等式：
-  1. `i2 & ~i0 | i1 & i0 | i1 & i2 = ~i0 & i2 | 0xC00020130082C0C`
-  2. i2 & ~i0 = 0x11204161012
-  3. 0x3E3A4717373E7F1F ^ i3 = 0x3E3A4717050F791F
-  4. 0x8020717153E3013 = i2 & ~i1 & i0 | i2 & ( i1 & i0 | i1 & ~i0 | ~(i1 | i0)) = i2
-  5. 0x3E3A4717373E7F1F = i2 & ~i0 | i1 & i0 | i2 & ~i1 | i0 & ~i1 = i2 | i0
+   1. `i2 & ~i0 | i1 & i0 | i1 & i2 = ~i0 & i2 | 0xC00020130082C0C`
+   2. `i2 & ~i0 = 0x11204161012`
+   3. `0x3E3A4717373E7F1F ^ i3 = 0x3E3A4717050F791F`
+   4. `0x8020717153E3013 = i2 & ~i1 & i0 | i2 & ( i1 & i0 | i1 & ~i0 | ~(i1 | i0)) = i2`
+   5. `0x3E3A4717373E7F1F = i2 & ~i0 | i1 & i0 | i2 & ~i1 | i0 & ~i1 = i2 | i0`
  - 可以解出：
-  1. i0 = i2 | i0 - i2 & ~i0 = 0x3E3A4717373E7F1F - 0x11204161012
-  2. i1 解不出
-  3. i2 = 0x8020717153E3013
-  4. i3 = 0x3E3A4717050F791F ^ 0x3E3A4717373E7F1F
- - i0,i1,i2,i3分别与`i_will_check_is_debug_or_not`按位异或即可得到flag
- - 其中i1对应的flag第二部分题目给出了：`'e!P0or_a'`
+   1. `i0 = i2 | i0 - i2 & ~i0 = 0x3E3A4717373E7F1F - 0x11204161012`
+   2. `i1` 解不出
+   3. `i2 = 0x8020717153E3013`
+   4. `i3 = 0x3E3A4717050F791F ^ 0x3E3A4717373E7F1F`
+ - `i0`,`i1`,`i2`,`i3`分别与`i_will_check_is_debug_or_not`按位异或即可得到flag
+ - 其中`i1`对应的flag第二部分题目给出了：`'e!P0or_a'`
 ```python
 #/usr/bin/python 
 #__author__: TaQini
@@ -343,6 +354,8 @@ print flag
 ![f1](./f1.png)
  - shell
 ![f2](./f2.png)
+ 
+ - poc
 
 ```python
 #!/usr/bin/python
@@ -365,6 +378,7 @@ p.sendline(payload)
 p.interactive()
 
 ```
+
 ![f3](./f3.png)
 
 ### my_canary
@@ -456,15 +470,15 @@ p.interactive()
 ```
 
 ### blind note
- - 输入66给`puts_libc`地址
+ - 输入`66`给`puts_libc`地址
 ![b1](./b1.png)
  - 每创建一个节点，指针加4字节
 ![b2](./b2.png)
  - 创建30个节点即可覆盖返回地址
- - 其中第26个是canary，可通过scanf('-')跳过
- - 通过scanf覆盖返回地址，并向栈中写入system和binsh的地址即可
+ - 其中第26个是canary，可通过`scanf('-')`跳过
+ - 通过`scanf`覆盖返回地址，并向栈中写入`system`和`binsh`的地址即可
 ![b3](./b3.png)
- - 需要注意System执行时`rsp`要对齐16字节，不然报错 (http://blog.eonew.cn/archives/958)
+ - 需要注意`system`执行时`rsp`要对齐16字节，不然报错 (http://blog.eonew.cn/archives/958)
 ![b4](./b4.png)
  - 执行`system`前，`rsp`%`16` = `8` 即可成功执行`system`
 

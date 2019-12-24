@@ -1,0 +1,2 @@
+a=ls;b=head$IFS-1;c=tac$IFS;d=`$a|$b`;$c$d
+# cat not work, use tac

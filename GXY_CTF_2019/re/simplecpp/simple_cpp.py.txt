@@ -1,0 +1,8 @@
+i0 = 0x3E3A4717050F791F - 0x11204161012
+i1 = 0 # unknow
+i2 = 0x8020717153E3013
+i3 = 0x3E3A4717373E7F1F ^ 0x3E3A4717050F791F
+
+print hex(i0),hex(i2),hex(i3)
+s = "i_will_check_is_debug_or_not"
+

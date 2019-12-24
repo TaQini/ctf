@@ -1,0 +1,2 @@
+e00cf25ad42683b3df678c61f42c6bda
+flag是flag{.*} .*是上面解出来的
