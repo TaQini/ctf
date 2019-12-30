@@ -142,7 +142,7 @@ print out
 
  - 得到flag
 
-![ga3](./ga3.png)
+ ![ga3](./ga3.png)
 
 ## Web
 
@@ -288,23 +288,23 @@ http://172.21.4.12:10031/?exp=print_r(highlight_file(next(array_reverse(scandir(
 
 - 第一部分给出了
 
-![guy2](./guy2.png)
+ ![guy2](./guy2.png)
 
 - 第二部分简单的算一下就能解出来(偶数位-1，奇数位-2)
 
-![guy3](./guy3.png)
+ ![guy3](./guy3.png)
 
-![guy4](./guy4.png)
+ ![guy4](./guy4.png)
 
 ### Simple CPP
  - 跟踪输入的字符串
-![cp1](./cp1.png)
-![cp2](./cp2.png)
+ ![cp1](./cp1.png)
+ ![cp2](./cp2.png)
  - 输入的字符串与`i_will_check_is_debug_or_not`按位异或
 ![cp5](./cp5.png)
  - 异或后的字符串被截成4段:`i0`,`i1`,`i2`,`i3`
  - `i0`,`i1`,`i2`长度为8字节，`i3`为4字节其中最后一位是`\0`
-![cp4](./cp4.png)
+ ![cp4](./cp4.png)
  - 随后进行一系列的逻辑运算
  - 能得到几个等式：
    1. `i2 & ~i0 | i1 & i0 | i1 & i2 = ~i0 & i2 | 0xC00020130082C0C`
@@ -319,32 +319,35 @@ http://172.21.4.12:10031/?exp=print_r(highlight_file(next(array_reverse(scandir(
    4. `i3 = 0x3E3A4717050F791F ^ 0x3E3A4717373E7F1F`
  - `i0`,`i1`,`i2`,`i3`分别与`i_will_check_is_debug_or_not`按位异或即可得到flag
  - 其中`i1`对应的flag第二部分题目给出了：`'e!P0or_a'`
+
 ```python
-#/usr/bin/python 
+#/usr/bin/python
 #__author__: TaQini
 
-from pwn import * 
+from pwn import *
 
-i0 = 0x3E3A4717373E7F1F - 0x11204161012 
-i1 = 0x0 # unknow 
-i2 = 0x8020717153E3013 
+i0 = 0x3E3A4717373E7F1F - 0x11204161012
+i1 = 0x0 # unknow
+i2 = 0x8020717153E3013
 i3 = 0x3E3A4717373E7F1F ^ 0x3E3A4717050F791F # 0x32310600
 
 # print hex(i0),hex(i2),hex(i3)
-s0 = "i_will_check_is_debug_or_not" 
+s0 = "i_will_check_is_debug_or_not"
 s1 = p64(i0,endianness='big')+p64(i1,endianness='big')+p64(i2,endianness='big')+p32(i3,endianness='big') 
 
-flag = '' 
-for i in range(len(s0)): 
-    if i<7 or i>15: 
-        flag += chr(ord(s0[i])^ord(s1[i])) 
-    know = 'e!P0or_a' 
-    if i==8: 
-        flag += know 
+flag = ''
+for i in range(len(s0)):
+    if i<7 or i>15:
+        flag += chr(ord(s0[i])^ord(s1[i]))
+    know = 'e!P0or_a'
+    if i==8:
+        flag += know
 
 print flag
 ```
-![cp6](./cp6.png)
+
+
+ ![cp6](./cp6.png)
  - 第四部分多了个`t`，也在提示中给出了
 
 ## Pwn
@@ -354,10 +357,10 @@ print flag
 ![f1](./f1.png)
  - shell
 ![f2](./f2.png)
- 
+
  - poc
 
-```python
+``` python
 #!/usr/bin/python
 #__author__: TaQini
 from pwn import *
