@@ -1,0 +1,15 @@
+In [10]: base64.b64decode('XlNkVmtUI1MgXWBZXCFeKY+AaXNt')
+Out[10]: '^SdVkT#S ]`Y\\!^)\x8f\x80ism'
+
+In [11]: def decode(msg):
+    ...:     s = ''
+    ...:     for i in msg:
+    ...:         x = ord(i)
+    ...:         x = x - 16
+    ...:         x = x ^ 32
+    ...:         s += chr(x)
+    ...:     return s
+    ...: 
+
+In [12]: decode('^SdVkT#S ]`Y\\!^)\x8f\x80ism')
+Out[12]: 'nctf{d3c0mpil1n9_PyC}'

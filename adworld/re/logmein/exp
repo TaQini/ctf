@@ -1,0 +1,7 @@
+% ./a.out 
+Welcome to the RC3 secure password guesser.
+To continue, you must enter the correct password.
+Enter your guess: 11111111111111111
+RC3-2016-XORISGUD
+right
+

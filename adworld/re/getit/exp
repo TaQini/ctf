@@ -1,0 +1,7 @@
+pwndbg> b *0x0000000004007C7
+Breakpoint 1 at 0x4007c7
+pwndbg> r
+...
+pwndbg> x/s 0x6010E0
+0x6010e0 <t>:	"SharifCTF{b70c59275fcfa8aebf2d5911223c6589}"
+
