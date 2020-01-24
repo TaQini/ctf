@@ -1,0 +1,2 @@
+% rabin2 -zz flag.jpg| grep flag
+2    0x0000107c 0x0000107c 14   30           utf16le flag{Wadf_123}
