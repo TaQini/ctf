@@ -20,28 +20,33 @@ else:
     	output = argv[2]
     py = open(output,'w')
 
-    header = "#!/usr/bin/python\n#__author__:TaQini\n\n"
+    header = "#!/usr/bin/python\n#coding=utf-8\n#__author__:TaQini\n\n"
     header+= "from pwn import *\n\n"
-
-    context = "context.log_level = 'debug'\n"
-    context+= "context.arch = 'amd64' # 'i386'\n\n"
 
     fileinfo = "local_file  = "
     fileinfo+= '\''+ filename + '\'\n'
     fileinfo+= "local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'\n"
-    fileinfo+= "remote_libc = '/lib/x86_64-linux-gnu/libc.so.6'\n\n"
+    fileinfo+= "remote_libc = local_libc # '../libc.so.6'\n\n"
+    fileinfo+= "is_local = False\n"
+    fileinfo+= "is_remote = False\n\n"
 
     process = "if len(sys.argv) == 1:\n"
+    process+= "    is_local = True\n"
     process+= "    p = process(local_file)\n"
     process+= "    libc = ELF(local_libc)\n"
     process+= "elif len(sys.argv) > 1:\n"
-    process+= "    host, port = sys.argv[1].split(':')\n"
+    process+= "    is_remote = True\n"
     process+= "    if len(sys.argv) == 3:\n"
     process+= "        host = sys.argv[1]\n"
     process+= "        port = sys.argv[2]\n"
+    process+= "    else:\n"
+    process+= "        host, port = sys.argv[1].split(':')\n"
     process+= "    p = remote(host, port)\n"
     process+= "    libc = ELF(remote_libc)\n\n"
     process+= "elf = ELF(local_file)\n\n"
+
+    context = "context.log_level = 'debug'\n"
+    context+= "context.arch = elf.arch\n\n"
 
     pwncode = "se      = lambda data               :p.send(data) \n"
     pwncode+= "sa      = lambda delim,data         :p.sendafter(delim, data)\n"
@@ -55,7 +60,7 @@ else:
     pwncode+= "info_addr = lambda tag, addr        :p.info(tag + ': {:#x}'.format(addr))\n\n"
 
     debug = "def debug(cmd=''):\n"
-    debug+= "    gdb.attach(p,cmd)\n\n"
+    debug+= "    if is_local: gdb.attach(p,cmd)\n\n"
 
     info = "# info\n# gadget\n"
     # auto add gadget addr of pop rdi
@@ -65,9 +70,9 @@ else:
 
     info+= "prdi = " + gadget[0].replace(':','#') + '\n'
     info+= "# elf, libc\n\n# rop1\n"
-    info+= "len = 0\n"
+    info+= "offset = 0\n"
 
-    payload = "payload = 'A'*len\npayload += ''\n\n"
+    payload = "payload = 'A'*offset\npayload += ''\n\n"
     payload+= "# ru('')\n# sl(payload)\n\n"
 
     tailer = "# debug()\n"
@@ -75,9 +80,9 @@ else:
     tailer+= "p.interactive()\n\n"
 
     py.write(header)
-    py.write(context)
     py.write(fileinfo)
     py.write(process)
+    py.write(context)
     py.write(pwncode)
     py.write(debug)
     py.write(info)
