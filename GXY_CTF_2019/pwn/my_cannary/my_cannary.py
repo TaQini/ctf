@@ -3,8 +3,8 @@
 from pwn import *
 
 # p = process('./my_cannary')
-p = remote('172.21.4.12',10102)
-
+# p = remote('172.21.4.12',10102)
+p = remote('183.129.189.60',10013)
 # context.log_level = 'debug'
 
 elf = ELF('./my_cannary')
