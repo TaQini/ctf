@@ -1,0 +1,17 @@
+% nc 47.103.214.163 21001
+There is a back door..."Hacked by Annevi!"
+6299752
+&
+==========================================
+ ____  
+|  _ \ ___  _ __ _ __ | | | |_   _| |__  
+| |_) / _ \| '__| '_ \| |_| | | | | '_ \ 
+|  __/ (_) | |  | | | |  _  | |_| | |_) |
+|_|   \___/|_|  |_| |_|_| |_|\__,_|_.__/ 
+
+==========================================
+              Login System
+Account:Password:%s
+hgame{VGhlX2Fub3RoZXJfd2F5X3RvX2hlYXZlbg==}Wrong Password!
+Forgot your password?(y/n)
+
