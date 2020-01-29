@@ -1,0 +1,22 @@
+
+In [1]: s="WV6EWF[8dGU5]Y<pQZ8iPZ8iSKk7gnh="
+
+In [2]: ss=''
+
+In [3]: for i in range(len(s)):
+   ...:     if i<8:
+   ...:         ss+=chr(ord(s[i])-1)
+   ...:     elif i<24:
+   ...:         ss+=chr(ord(s[i])-3)
+   ...:     elif i<32:
+   ...:         ss+=chr(ord(s[i])-4)
+   ...:         
+
+In [4]: ss
+Out[4]: 'VU5DVEZ7aDR2ZV9mNW5fMW5fOGg3cjd9'
+
+In [5]: import base64
+
+In [6]: base64.b64decode(ss)
+Out[6]: 'UNCTF{h4ve_f5n_1n_8h7r7}'
+
