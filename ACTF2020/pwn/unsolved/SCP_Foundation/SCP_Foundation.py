@@ -6,7 +6,7 @@ from pwn import *
 
 local_file  = './SCP_Foundation'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = local_libc # '../libc.so.6'
+remote_libc = '../../libc-2.23.so'
 
 is_local = False
 is_remote = False
