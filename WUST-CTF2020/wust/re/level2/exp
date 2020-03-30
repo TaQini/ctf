@@ -1,0 +1,3 @@
+upx -d
+rabin2 -zz lv2/level2 | grep ctf 
+6579 0x000a1068 0x080ea068 21  22   .data                    ascii   wctf2020{Just_upx_-d}
