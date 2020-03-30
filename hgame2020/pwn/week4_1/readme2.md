@@ -1,3 +1,9 @@
+# 前言
+
+这道题不难，算是`r2dl_resolve`的入门题。这几天开学在家自学，学到自闭，有一门课要连续上五天，每天自学100+页PPT，看两篇近两年内发布的论文，然后还要做persentation录成视频发给老师…截止时间是每天凌晨12点…PPT还要求是英文，课件也是英文…
+
+这不，今天熬到十一点多，终于录完视频了，想着放松一下，随手翻出了Hgame的wp，看了看第四周的pwn，发现是`r2dl_resolve`的题目，还有现成的脚本，于是赶紧一键拿走。脚本作者是杭电vidar的`Veritas501`师傅，他博客里还有个x64的脚本，正好春节的时候有个x64的`r2dl_resolve`题还没做，先把脚本拿过来，明天再看hhh
+
 ## ROP5
 
 - 题目描述：
@@ -17,7 +23,8 @@
 
 - 完成人数：14
 
-### 程序分析
+
+## 程序分析
 
 漏洞函数如下，存在缓冲区溢出：
 
@@ -34,15 +41,16 @@ void vuln(void){
 }
 ```
 
-### 解题思路
+## 解题思路
+读数据前关闭了stdout和stderr，无法向stdout打印数据，因此不能通过puts来泄漏libc地址
 
-读数据前关闭了`stdout`和`stderr`，无法向`stdout`打印数据，因此不能通过`puts`来泄漏`libc`地址
+也就是说需要直接执行`system('/bin/sh >&0')`来获取shell，于是只能通过`r2dl_reslove`实现
 
-也就是说需要直接执行`system('/bin/sh >&0')`来获取`shell`，于是只能通过`r2dl_reslove`实现
+[Veritas501](https://veritas501.space/)师傅的文章有详细`r2dl_reslove`，还写了脚本，我就一键拿走了
 
-[Veritas501师傅](https://veritas501.space/)的文章有详细`r2dl_reslove`，还写了[脚本](https://veritas501.space/2017/10/07/ret2dl_resolve%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/)，我就一键拿走了
 
-### exp
+
+## exp
 
 ```python
 #!/usr/bin/python
@@ -162,6 +170,4 @@ sl(dl_data+'$0 1>&0\0')
 
 p.interactive()
 ```
-
-
 
