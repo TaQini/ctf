@@ -1,0 +1,8 @@
+#!/bin/bash
+EXIT="exit"
+
+while [ 1 ]
+do
+	read -p 'nash> ' input
+	echo $input | sed 's/ //g' | sed 's/{//g'| sed 's/}//g' | sed 's/IFS//g' | sed 's/(//g' | sed 's/)//g' | /bin/bash
+done

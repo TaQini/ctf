@@ -187,4 +187,3 @@ the offset is not same between different OS, so we have to download an ubnutu 18
 
 you can download full exp from my [github](https://github.com/TaQini/ctf/tree/master/ByteBanditsCTF2020/pwn/chall) 
 
-
