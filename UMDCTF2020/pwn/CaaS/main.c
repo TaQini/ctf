@@ -9,7 +9,7 @@ void moo(char *msg)
 
         strcpy(speak, msg);
         speak[strcspn(speak, "\r\n")] = 0;
-        setenv("MSG", speak, chief_cow);
+        setenv("MSG", speak, 0);
 
         system("./cowsay $MSG");
 
