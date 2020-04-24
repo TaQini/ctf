@@ -1,0 +1,23 @@
+Foremost version 1.5.7 by Jesse Kornblum, Kris Kendall, and Nick Mikus
+Audit File
+
+Foremost started at Sat Apr 25 02:26:39 2020
+Invocation: foremost ./corshinesecarmy.jpg 
+Output directory: /home/taqini/Downloads/sarcon/output
+Configuration file: /etc/foremost.conf
+------------------------------------------------------------------
+File: ./corshinesecarmy.jpg
+Start: Sat Apr 25 02:26:39 2020
+Length: 13 KB (14293 bytes)
+ 
+Num	 Name (bs=512)	       Size	 File Offset	 Comment 
+
+0:	00000000.jpg 	      13 KB 	          0 	 
+Finish: Sat Apr 25 02:26:39 2020
+
+1 FILES EXTRACTED
+	
+jpg:= 1
+------------------------------------------------------------------
+
+Foremost finished at Sat Apr 25 02:26:39 2020
