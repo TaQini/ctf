@@ -8,7 +8,7 @@
 
 ### Attachment
 
-[mousetrap](https://cdn.jsdelivr.net/gh/TaQini/ctf@master/HackPark-CTF-2020/pwn/mousetrap/mousetrap)
+[mousetrap](https://cdn.jsdelivr.net/gh/TaQini/ctf@master/HackPack-CTF-2020/pwn/mousetrap/mousetrap)
 
 ### Analysis
 
@@ -103,6 +103,6 @@ sla('Enter Code Sequence of 1000: ',pl2)
 
 ### More
 
-you can download full exp from my [github](https://github.com/TaQini/ctf/tree/master/HackPark-CTF-2020/pwn/mousetrap) 
+you can download full exp from my [github](https://github.com/TaQini/ctf/tree/master/HackPack-CTF-2020/pwn/mousetrap) 
 
 
