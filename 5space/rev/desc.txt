@@ -1,0 +1,3 @@
+#./rev `cat flag.txt` 
+right
+

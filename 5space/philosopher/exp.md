@@ -1,0 +1,1 @@
+flag{deep_dark_fantasty_now}
