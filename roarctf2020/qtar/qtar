@@ -1,0 +1,125 @@
+#!/usr/bin/python
+import os, sys, time, uuid, tarfile
+
+class Hacker(Exception):
+    pass
+
+try:
+    path = '/tmp/' + uuid.uuid4().hex
+    if os.path.exists(path):
+        print('unknown error! please contact to admin')
+        exit()
+    else:
+        os.makedirs(path)
+        os.chdir(path)
+    print('poor compress system, type h for help')
+    compress = []
+    extract = []
+    while 1:
+        choose = raw_input('> ')
+        if choose == 'h':
+            print('\th -- show this help')
+            print('\ts -- show workdir')
+            print('\tu -- upload file')
+            print('\tc -- compress file')
+            print('\tx -- extract file')
+            print('\tr -- read file')
+            print('\tq -- quit&hint')
+            continue
+        if choose == 's':
+            print('Workdir:', os.getcwd())
+            #os.system('ls -al')
+            #os.system('ls -al /proc/self/cwd')
+            continue
+        elif choose == 'u':
+            file = '/tmp/' + uuid.uuid4().hex
+            content = raw_input('Content:')
+            f = open(file,'w')
+            f.write(content)
+            f.close()
+            print('File uploaded as', file)
+            continue
+        elif choose == 'c':
+            dst = uuid.uuid4().hex
+            tar = tarfile.open(dst,'w')
+            src = raw_input('Filename: /tmp/')
+            arcname = src
+            if '.' in src or '/' in src:
+                raise Hacker()
+            src = '/tmp/' + src
+            if not os.path.exists(src):
+                print(src,': No such file or directory')
+                continue
+            rename = raw_input('Rename archive file? [y/N]')
+            if 'y' in rename or 'Y' in rename:
+                arcname = raw_input('Arcname: ')
+            tar.add(src, arcname=arcname)
+            tar.close()
+            print('File compressed as', dst)
+            compress.append(dst)
+            extract.append(arcname)
+            continue
+        elif choose == 'x':
+            src = raw_input('Filename: ')
+            if '.' in src or '/' in src:
+                raise Hacker()
+            if not os.path.exists(src):
+                print(src,': No such file or directory')
+                continue
+            if src not in compress:
+                print('Please compress file first')
+                continue
+            check = open(src,'r')
+            content = check.read()
+            check.close()
+            if 'home' in content:
+                print("What? u input 'home' ??")
+                raise Hacker()
+            tar = tarfile.open(src,'r')
+            tar.extractall()
+            tar.close()
+            compress.remove(src)
+            continue
+        elif choose == 'r':
+            src = raw_input('Filename: ')
+            if '.' in src or '/' in src:
+                raise Hacker()
+            if not os.path.exists(src):
+                print(src,': No such file or directory')
+                continue
+            if src not in extract:
+                print('permission denied:', src)
+                continue
+            file = open(src)
+            print(file.read())
+            file.close()
+        elif choose == 'q':
+            print('byebye!')
+            time.sleep(0.9)
+            print('  A: Here is the flag: \033[08m/home/ctf/flag\033[0m')
+            time.sleep(0.6)
+            print('  B: What?')
+            time.sleep(0.6)
+            print('       ...I can\'t see it.')
+            time.sleep(0.6)
+            print('  A: Really? Look at it carefully.')
+            time.sleep(0.6)
+            print('       ......')
+            time.sleep(1.7)
+            print('  B: OH YEAH!')
+            time.sleep(0.4)
+            print('       Now I can')
+            time.sleep(0.5)
+            print('         \033[07mC\033[0mapture \033[07mT\033[0mhe \033[07mF\033[0mlag')
+            break
+        else:
+            print('Wrong cmd!')
+            continue
+
+except Hacker:
+    print('Hacker!!!')
+    exit()
+
+except BaseException as e:
+    print(e)
+    exit()
